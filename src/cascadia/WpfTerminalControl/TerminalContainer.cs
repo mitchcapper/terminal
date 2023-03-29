@@ -113,10 +113,23 @@ namespace Microsoft.Terminal.Wpf
                 {
                     this.connection.TerminalOutput -= this.Connection_TerminalOutput;
                 }
-
+                this.Connection_TerminalOutput(this, new TerminalOutputEventArgs("\u001b[2J")); //clear screen
+                var wasNull = this.connection == null;
                 this.connection = value;
-                this.connection.TerminalOutput += this.Connection_TerminalOutput;
-                this.connection.Start();
+                if (this.connection != null)
+                {
+                    if (wasNull)
+                    {
+                         this.Connection_TerminalOutput(this, new TerminalOutputEventArgs("\u001b[?25h"));//show cursor
+                    }
+                    this.connection.TerminalOutput += this.Connection_TerminalOutput;
+                    this.connection.Start();
+                }
+                else
+                {
+                    this.Connection_TerminalOutput(this, new TerminalOutputEventArgs("\u001b[?25l")); //hide cursor
+                }
+                    
             }
         }
 
